@@ -1,0 +1,59 @@
+# javascript
+[[sweep]]
+folder = "node_modules"
+predicate = ["package.json"]
+
+# rust
+[[sweep]]
+folder = "target"
+predicate = ["Cargo.toml"]
+
+# typescript
+[[sweep]]
+folder = "dist"
+predicate = ["tsconfig.json"]
+
+# c++
+[[sweep]]
+folder = "build"
+predicate = ["CMakeLists.txt"]
+
+[[sweep]]
+folder = "build"
+
+# python
+[[sweep]]
+folder = "__pycache__"
+
+[[sweep]]
+folder = ".pytest_cache"
+
+[[sweep]]
+
+# java
+[[sweep]]
+folder = "out"
+predicate = ["build.gradle", "pom.xml"]
+
+[[sweep]]
+folder = "build"
+predicate = ["build.gradle", "pom.xml"]
+
+# go
+[[sweep]]
+folder = "bin"
+predicate = ["go.mod"]
+
+# c#
+[[sweep]]
+folder = "bin"
+predicate = ["*.csproj"]
+
+[[sweep]]
+folder = "obj"
+predicate = ["*.csproj"]
+
+# ruby
+[[sweep]]
+folder = "pkg"
+predicate = ["Gemfile"]

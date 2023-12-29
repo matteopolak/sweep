@@ -172,7 +172,7 @@ func GetDirSize(dir string) int64 {
 	size := int64(0)
 
 	// get the directory content
-	dirContent, err := os.ReadDir(dir)
+	files, err := os.ReadDir(dir)
 
 	// if there's an error, return it
 	if err != nil {
@@ -181,9 +181,11 @@ func GetDirSize(dir string) int64 {
 
 	// iterate over the directory content, and if the entry is a file,
 	// add its size to the total size
-	for _, dir := range dirContent {
-		if !dir.IsDir() {
-			fileInfo, err := dir.Info()
+	for _, file := range files {
+		if file.IsDir() {
+			size += GetDirSize(path.Join(dir, file.Name()))
+		} else {
+			fileInfo, err := file.Info()
 
 			if err != nil {
 				continue

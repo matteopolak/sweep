@@ -3,25 +3,16 @@ package main
 // import bubbletea
 import (
 	"bufio"
+	_ "embed"
 	"fmt"
+	"io/fs"
 	"os"
 
 	sw "github.com/matteopolak/sweep/pkg/api"
 )
 
-// create default predicates
-func defaultPredicates() []sw.Predicate {
-	return []sw.Predicate{
-		{
-			Folder:    "node_modules",
-			Predicate: func(s string) bool { return s == "package.json" },
-		},
-		{
-			Folder:    "target",
-			Predicate: func(s string) bool { return s == "Cargo.toml" },
-		},
-	}
-}
+//go:embed sweep.toml
+var defaultConfig string
 
 // main is the entrypoint for the program
 func main() {
@@ -34,12 +25,34 @@ func main() {
 		os.Exit(1)
 	}
 
-	// print cwd
-	fmt.Println(cwd)
+	fmt.Println("using root directory: ", cwd)
+
+	// read sweep.toml, otherwise use the default config
+	rawContent, err := fs.ReadFile(os.DirFS(cwd), "sweep.toml")
+	content := ""
+
+	if err != nil {
+		content = defaultConfig
+
+		fmt.Println("using default config")
+	} else {
+		content = string(rawContent)
+
+		fmt.Println("using config from sweep.toml")
+	}
+
+	// parse the config
+	config, err := sw.ParseConfig(content)
+
+	// if there's an error, print it and exit
+	if err != nil {
+		fmt.Printf("could not parse config: %s\n", err)
+		os.Exit(1)
+	}
 
 	// then, get a new iterator for the current working directory
 	// with the default predicates
-	iterator := sw.NewDirIterator(cwd, defaultPredicates(), []string{".git"})
+	iterator := sw.NewDirIterator(cwd, config.Predicates, []string{".git"})
 
 	// then, iterate over the iterator
 	for {
@@ -61,14 +74,14 @@ func main() {
 		// also provide the size of the folder
 		size := sw.GetDirSize(folder)
 
-		fmt.Printf("(%s) delete %s? [y/n] ", FormatBytes(size), folder)
+		fmt.Printf("(%s) delete %s? [Y/n] ", FormatBytes(size), folder)
 
 		// read the user's input
 		reader := bufio.NewReader(os.Stdin)
 		text, _ := reader.ReadString('\n')
 
 		// if the user wants to delete the folder, delete it
-		if text == "y\n" || text == "y\r\n" {
+		if text == "y\n" || text == "y\r\n" || text == "\n" || text == "\r\n" {
 			err := os.RemoveAll(folder)
 
 			if err != nil {
