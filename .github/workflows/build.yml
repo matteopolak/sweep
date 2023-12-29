@@ -7,9 +7,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Setup Go 1.21
+      - name: setup go 1.21
         uses: actions/setup-go@v4
         with:
           go-version: 1.21
-      - name: Display Go version
-        run: go build cmd/sweep
+      - name: build sweep
+        run: go build ./cmd/sweep
